@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lauren Elizabeth — Home</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <header class="hero">
+    <div class="sun" aria-hidden="true"></div>
+    <h1>Lauren Elizabeth</h1>
+    <p>Handy tools and checklists, all in one place. Pick one to get started.</p>
+  </header>
+
+  <main class="hub">
+    <h2>Tools &amp; Checklists</h2>
+    <div class="tile-grid">
+
+      <a class="tile" href="motorhome-checklist.html">
+        <span class="emoji" aria-hidden="true">🚐</span>
+        <span class="t-title">Motorhome Purchase Checklist</span>
+        <span class="t-desc">Walk through a used motorhome inspection step by step. Tick items, flag problems, add
+          notes.</span>
+        <span class="t-go">Open checklist →</span>
+      </a>
+
+      <!-- To add a new page later: copy the block above, change the href, emoji, title and description. -->
+
+      <div class="tile soon" aria-disabled="true">
+        <span class="emoji" aria-hidden="true">✨</span>
+        <span class="t-title">Coming soon</span>
+        <span class="t-desc">Another page will live here.</span>
+        <span class="t-go">—</span>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>© <span id="yr"></span> Lauren Elizabeth</footer>
+  <script>document.getElementById("yr").textContent = new Date().getFullYear();</script>
+</body>
+
+</html>

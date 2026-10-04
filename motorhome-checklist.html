@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Motorhome Purchase Checklist</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <div class="plate-wrap">
+    <div class="plate">
+      <span class="rivet tl"></span><span class="rivet tr"></span>
+      <span class="rivet bl"></span><span class="rivet br"></span>
+      <a class="back-link" href="index.html">← Home</a>
+      <p class="plate-eyebrow">Pre-Purchase Inspection</p>
+      <h1 class="plate-title">Motorhome Purchase Checklist</h1>
+      <div class="plate-fields">
+        <div class="pf"><label for="f-unit">Unit (Year / Make / Model)</label><input id="f-unit"
+            placeholder="e.g. 2018 Winnebago View"></div>
+        <div class="pf"><label for="f-seller">Seller / Dealer</label><input id="f-seller" placeholder="—"></div>
+        <div class="pf"><label for="f-date">Inspection Date</label><input id="f-date" type="date"></div>
+        <div class="pf"><label for="f-inspector">Inspected By</label><input id="f-inspector" placeholder="—"></div>
+      </div>
+    </div>
+    <div class="gauge-row">
+      <div class="gauge-label"><span id="gauge-text">0 of 0 items checked</span><span id="gauge-pct">0%</span></div>
+      <div class="gauge-track">
+        <div class="gauge-fill" id="gauge-fill" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-wrap">
+    <div class="mini-gauge-row">
+      <span class="mini-gauge-text" id="mini-gauge-text">0 of 0</span>
+      <div class="mini-gauge-track">
+        <div class="mini-gauge-fill" id="mini-gauge-fill" style="width:0%"></div>
+      </div>
+      <span class="mini-gauge-pct" id="mini-gauge-pct">0%</span>
+    </div>
+    <div class="nav-scroll" id="nav-scroll"></div>
+  </div>
+
+  <div class="container">
+
+    <div class="card-note">
+      <h3>How to use this checklist</h3>
+      <p>Work through each section in order and tick items as you go. Take your time, since an inspection is not a race.
+        Tap <strong>⚑ Flag</strong> on anything that worries you and <strong>+ Note</strong> to jot details. Your
+        progress saves automatically on this device.</p>
+      <p>Ask the seller to have the unit on shore power, with water, propane and fuel available, so every system can be
+        tested live. If you look at more than one unit, use <em>Reset</em> (or the "Copy Report" button first) so
+        details do not blur together.</p>
+    </div>
+
+    <div class="phase-btns">
+      <span class="phase-btn" id="btn-collapse">Collapse All</span>
+      <span class="phase-btn" id="btn-expand">Expand All</span>
+    </div>
+
+    <div id="sections"></div>
+
+    <div class="summary">
+      <h2>Inspection Summary</h2>
+      <div class="summary-grid" id="summary-grid"></div>
+      <div id="flag-block"></div>
+      <div class="btn-row">
+        <button class="action" id="btn-export">Copy Full Report</button>
+        <button class="action" id="btn-print">Print</button>
+        <button class="action reset" id="btn-reset">Reset All</button>
+      </div>
+    </div>
+
+    <div class="card-note sources">
+      <h3>Sources</h3>
+      <ul>
+        <li>HappilyRV: Used RV Pre-Purchase Inspection Checklist (PDF)</li>
+        <li>RV Help: Free RV Inspection Checklist</li>
+        <li>Go RV Rentals: Printable Pre-Delivery RV Inspection Checklist</li>
+        <li>Campers Inn: Used RV Inspection Checklist</li>
+        <li>Camper Smarts: How to Inspect a Used RV</li>
+        <li>RecNation: Zone-by-Zone RV Inspection Guide</li>
+        <li>The Happy Glamper Co.: Complete Used RV Inspection Checklist</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>Saved automatically to this device as you go · Motorhome Purchase Checklist</footer>
+  <div class="save-toast" id="toast" role="status">Saved</div>
+
+  <script src="checklist.js"></script>
+</body>
+
+</html>

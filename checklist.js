@@ -739,14 +739,17 @@ $("btn-expand").onclick = () => setAllCollapsed(false);
 $("btn-print").onclick = () => window.print();
 
 $("btn-reset").onclick = () => {
-  if(!confirm("Reset all checkmarks, flags, notes and fields? This cannot be undone.")) return;
+  if(!confirm("Start a new, blank checklist? This clears everything saved on this device for the current one, and cannot be undone.\n\nTip: tap Cancel and use Download PDF or Save to Drive first if you want to keep a copy.")) return;
   state = BLANK();
   META_IDS.forEach(k => { $("f-" + k).value = ""; });
   document.querySelectorAll("[data-field]").forEach(i => { i.value = ""; });
   renderGroups();
   renderIssues();
   refreshCounts();
+  setAllCollapsed(true);
   saveState();
+  window.scrollTo({ top:0, behavior:"smooth" });
+  showToast("New checklist started");
 };
 
 $("btn-export").onclick = () => {

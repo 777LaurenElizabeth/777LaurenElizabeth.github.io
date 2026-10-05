@@ -44,8 +44,9 @@
           cost.</li>
         <li><strong>Finish with the summary.</strong> Export a PDF, save it to your Drive folder, or print it.</li>
       </ol>
-      <p>Your progress saves automatically on the device you are using. If you look at more than one unit, export the
-        PDF first and then use <em>Reset All</em>, so the details do not blur together.</p>
+      <p>Your progress saves automatically on the device you are using, so you can close the page and come back. If you
+        look at more than one unit, export the PDF first and then choose <em>Start a new checklist</em>, so the details
+        do not blur together.</p>
     </div>
 
     <div class="card-note">
@@ -64,13 +65,45 @@
     </div>
 
     <div class="start-wrap">
-      <a class="start-btn" href="motorhome-checklist.html">Get started with your checklist</a>
+      <a class="start-btn" id="btn-start" href="motorhome-checklist.html">Get started with your checklist</a>
+      <div id="resume" hidden>
+        <p class="resume-note" id="resume-note"></p>
+        <div class="start-choices">
+          <a class="start-btn" href="motorhome-checklist.html">Continue current checklist</a>
+          <button type="button" class="start-btn alt" id="btn-new">Start a new checklist</button>
+        </div>
+      </div>
     </div>
 
   </div>
 
   <footer>Motorhome Purchase Checklist</footer>
 
+  <script>
+    // Same key the checklist page saves under.
+    const KEY = "motorhome-checklist-v1";
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(KEY)); } catch (e) { }
+    const count = (o) => Object.keys(o || {}).length;
+    const progress = saved && (count(saved.checks) + count(saved.flagged) + count(saved.notes) +
+      count(saved.fields) + count(saved.custom) + Object.values(saved.meta || {}).filter(Boolean).length +
+      (saved.issues || []).filter(r => r.issue || r.location || r.cost).length);
+
+    if (progress) {
+      const unit = saved.meta && saved.meta.unit;
+      document.getElementById("resume-note").textContent =
+        "You have a checklist in progress" + (unit ? " for " + unit : "") + " on this device (" +
+        count(saved.checks) + " items checked).";
+      document.getElementById("btn-start").hidden = true;
+      document.getElementById("resume").hidden = false;
+    }
+
+    document.getElementById("btn-new").onclick = () => {
+      if (!confirm("Start a new, blank checklist? This clears the checklist saved on this device, and cannot be undone.\n\nTip: tap Cancel and open your current checklist first if you want to download a PDF or save it to Drive.")) return;
+      try { localStorage.removeItem(KEY); } catch (e) { }
+      location.href = "motorhome-checklist.html";
+    };
+  </script>
 </body>
 
 </html>

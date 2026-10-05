@@ -437,3 +437,14 @@ body.modal-open{overflow:hidden;}
   .add-area,.note-modal,.del-custom{display:none !important;}
   .note-preview{background:#fff;}
 }
+
+/* ---------- Continue / start new ---------- */
+.resume-note{margin:0 0 12px;font-size:14px;color:var(--ink-soft);}
+.start-choices{display:flex;flex-direction:column;align-items:center;gap:12px;}
+button.start-btn{border:0;cursor:pointer;}
+.start-btn.alt{
+  background:var(--paper);color:var(--ink);border:2px solid var(--ink);
+  box-shadow:3px 3px 0 var(--orange);
+}
+button.start-btn.alt{border:2px solid var(--ink);}
+.start-btn.alt:hover,.start-btn.alt:focus-visible{background:var(--peach);color:var(--ink);}

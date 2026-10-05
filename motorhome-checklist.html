@@ -18,7 +18,7 @@
     <div class="plate">
       <span class="rivet tl"></span><span class="rivet tr"></span>
       <span class="rivet bl"></span><span class="rivet br"></span>
-      <a class="back-link" href="index.html">← Home</a>
+      <a class="back-link" href="motorhome-howto.html">← How to use</a>
       <p class="plate-eyebrow">Pre-Purchase Inspection</p>
       <h1 class="plate-title">Motorhome Purchase Checklist</h1>
       <div class="plate-fields">
@@ -51,13 +51,9 @@
   <div class="container">
 
     <div class="card-note">
-      <h3>How to use this checklist</h3>
-      <p>Work through each section in order and tick items as you go. Take your time, since an inspection is not a race.
-        Tap <strong>⚑ Flag</strong> on anything that worries you and <strong>+ Note</strong> to jot details. Your
-        progress saves automatically on this device.</p>
-      <p>Ask the seller to have the unit on shore power, with water, propane and fuel available, so every system can be
-        tested live. If you look at more than one unit, use <em>Reset</em> (or the "Copy Report" button first) so
-        details do not blur together.</p>
+      <p>Tick items as you go, <strong>⚑ Flag</strong> anything that worries you and add a <strong>+ Note</strong> for
+        details. Progress saves automatically on this device. <a href="motorhome-howto.html">Review how to use this
+          checklist</a>.</p>
     </div>
 
     <div class="phase-btns">
@@ -72,10 +68,14 @@
       <div class="summary-grid" id="summary-grid"></div>
       <div id="flag-block"></div>
       <div class="btn-row">
+        <button class="action" id="btn-pdf">Download PDF</button>
+        <button class="action" id="btn-drive">Save to Drive</button>
         <button class="action" id="btn-export">Copy Full Report</button>
         <button class="action" id="btn-print">Print</button>
         <button class="action reset" id="btn-reset">Reset All</button>
       </div>
+      <p class="save-note">Save to Drive creates a PDF in your linked Google Drive folder. You will be asked to sign in
+        to Google the first time.</p>
     </div>
 
     <div class="card-note sources">
@@ -95,6 +95,10 @@
   <footer>Saved automatically to this device as you go · Motorhome Purchase Checklist</footer>
   <div class="save-toast" id="toast" role="status">Saved</div>
 
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="vendor/jspdf.umd.min.js"></script>
+  <script src="vendor/jspdf.plugin.autotable.min.js"></script>
+  <script src="config.js"></script>
   <script src="checklist.js"></script>
 </body>
 

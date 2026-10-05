@@ -1,6 +1,7 @@
 // ==========================================================
 // Motorhome Purchase Checklist
 // To change the checklist, edit the SECTIONS data below.
+// (The "what to bring" list lives on motorhome-howto.html.)
 //   type "checklist" -> groups of tick-able items
 //   type "details"   -> fill-in fields (plus optional groups)
 //   type "redflags"  -> read-only list of dealbreakers
@@ -8,20 +9,6 @@
 // ==========================================================
 
 const SECTIONS = [
-  { id:"bring", title:"What to Bring", type:"checklist", groups:[
-    { items:[
-      "Printed or digital copy of this checklist",
-      "Gloves for opening access panels and bays",
-      "Flashlight",
-      "Plug-in 110V outlet tester",
-      "Multimeter for battery voltage",
-      "Moisture meter",
-      "Tire tread depth gauge and tire pressure gauge",
-      "Phone or camera for photos of problem areas and data plates",
-      "Step ladder if the roof is walkable and the seller allows access"
-    ]}
-  ]},
-
   { id:"docs", title:"Unit Details, Documents & History", type:"details",
     fields:[
       ["Year / Make / Model"],["Class (A, B, C)"],["VIN"],["Mileage"],
@@ -339,7 +326,7 @@ const SECTIONS = [
 
 // Short names for the sticky nav chips (falls back to the full title).
 const SHORT = {
-  bring:"Bring", docs:"Documents", water:"Water & Structure", exterior:"Exterior",
+  docs:"Documents", water:"Water & Structure", exterior:"Exterior",
   tires:"Tires & Chassis", engine:"Engine", cab:"Test Drive", electrical:"Electrical",
   plumbing:"Plumbing", propane:"Propane & HVAC", interior:"Interior", safety:"Safety",
   redflags:"Red Flags", issues:"My Notes", pro:"Pro Inspection"
@@ -664,6 +651,160 @@ $("btn-export").onclick = () => {
   (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
     .then(() => showToast("Report copied to clipboard"))
     .catch(() => showToast("Copy failed — use Print instead"));
+};
+
+// ---------------- PDF export & Google Drive ----------------
+// Keep text inside what the built-in PDF fonts can draw.
+function pdfText(s){
+  return String(s)
+    .replace(/[—–]/g, "-").replace(/[‘’]/g, "'").replace(/[“”]/g, '"')
+    .replace(/…/g, "...").replace(/[^\x09\x0A\x20-\x7E -ÿ]/g, "");
+}
+
+function buildPDF(){
+  readIssues();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:"pt", format:"letter" });
+  const W = doc.internal.pageSize.getWidth(), M = 40;
+  const INK = [31,42,55], TEAL = [43,138,114], ORANGE = [185,80,15], PEACH = [251,209,162];
+  const m = state.meta;
+  let total = 0, done = 0, flagCount = 0;
+  SECTIONS.forEach((sec, si) => checklistItems(sec, si).forEach(it => {
+    total++; if(state.checks[it.id]) done++; if(state.flagged[it.id]) flagCount++;
+  }));
+
+  doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(...ORANGE);
+  doc.text("PRE-PURCHASE INSPECTION", M, 44);
+  doc.setFontSize(20); doc.setTextColor(...INK);
+  doc.text("Motorhome Purchase Checklist", M, 68);
+  doc.setFont("helvetica", "normal"); doc.setFontSize(10);
+  doc.text(pdfText("Unit: " + (m.unit || "-")), M, 90);
+  doc.text(pdfText("Seller / Dealer: " + (m.seller || "-")), M, 105);
+  doc.text(pdfText("Inspection date: " + (m.date || "-")), W / 2, 90);
+  doc.text(pdfText("Inspected by: " + (m.inspector || "-")), W / 2, 105);
+  const pct = total ? Math.round(done / total * 100) : 0;
+  doc.setFont("helvetica", "bold");
+  doc.text(done + " of " + total + " items checked (" + pct + "%)   |   " + flagCount + " flagged", M, 128);
+
+  let y = 142;
+  const head = (text) => ({ content:pdfText(text), colSpan:3, styles:{ fillColor:PEACH, textColor:INK, fontStyle:"bold", fontSize:10.5 } });
+  const common = {
+    theme:"grid", margin:{ left:M, right:M },
+    styles:{ font:"helvetica", fontSize:9, cellPadding:4, lineColor:[220,214,200], lineWidth:.5, textColor:INK, valign:"top" },
+    headStyles:{ fillColor:TEAL, textColor:255 },
+    columnStyles:{ 0:{ cellWidth:34, halign:"center", fontStyle:"bold" }, 1:{ cellWidth:"auto" }, 2:{ cellWidth:150 } }
+  };
+
+  SECTIONS.forEach((sec, si) => {
+    const rows = [[head((si + 1) + ". " + sec.title)]];
+    if(sec.intro) rows.push([{ content:pdfText(sec.intro), colSpan:3, styles:{ fontStyle:"italic", textColor:[91,102,114] } }]);
+    if(sec.type === "details"){
+      sec.fields.forEach((f, fi) => rows.push([{ content:"", styles:{} }, pdfText(f[0]), pdfText(state.fields[fi] || "-")]));
+    }
+    (sec.groups || []).forEach((g, gi) => {
+      if(g.title) rows.push([{ content:pdfText(g.title), colSpan:3, styles:{ fontStyle:"bold", textColor:TEAL } }]);
+      g.items.forEach((label, ii) => {
+        const id = `s${si}g${gi}i${ii}`;
+        const status = state.flagged[id] ? "FLAG" : (state.checks[id] ? "[X]" : "[ ]");
+        const row = [{ content:status, styles: state.flagged[id] ? { textColor:ORANGE } : {} }, pdfText(label), pdfText(state.notes[id] || "")];
+        rows.push(row);
+      });
+    });
+    if(sec.type === "redflags") sec.items.forEach(i => rows.push([{ content:"!", styles:{ textColor:ORANGE } }, { content:pdfText(i), colSpan:2 }]));
+    if(sec.type === "issues"){
+      const filled = state.issues.filter(r => r.issue || r.location || r.cost);
+      if(!filled.length) rows.push([{ content:"No issues logged.", colSpan:3, styles:{ textColor:[91,102,114] } }]);
+      filled.forEach(r => rows.push([
+        { content:r.dealbreaker ? "STOP" : "", styles:{ textColor:ORANGE } },
+        pdfText(r.issue || "-"),
+        pdfText((r.location || "-") + "  |  Est. cost: " + (r.cost || "-"))
+      ]));
+    }
+    doc.autoTable(Object.assign({}, common, { startY:y, body:rows }));
+    y = doc.lastAutoTable.finalY + 14;
+  });
+
+  const pages = doc.internal.getNumberOfPages();
+  for(let p = 1; p <= pages; p++){
+    doc.setPage(p); doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(120);
+    doc.text("Motorhome Purchase Checklist  -  page " + p + " of " + pages, W / 2, doc.internal.pageSize.getHeight() - 20, { align:"center" });
+  }
+  return doc;
+}
+
+function pdfFileName(){
+  const m = state.meta;
+  const slug = (m.unit || "motorhome").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "motorhome";
+  return "Motorhome-Inspection-" + slug + "-" + (m.date || new Date().toISOString().slice(0, 10)) + ".pdf";
+}
+
+$("btn-pdf").onclick = () => {
+  if(!window.jspdf){ showToast("PDF tool did not load. Try Print instead."); return; }
+  try{ buildPDF().save(pdfFileName()); showToast("PDF downloaded"); }
+  catch(e){ console.error(e); showToast("Could not make the PDF"); }
+};
+
+let driveTokenClient = null;
+function driveToken(){
+  return new Promise((resolve, reject) => {
+    const cfg = window.APP_CONFIG || {};
+    if(!cfg.GOOGLE_CLIENT_ID) return reject(new Error("no-client-id"));
+    if(!(window.google && google.accounts && google.accounts.oauth2)) return reject(new Error("no-gsi"));
+    if(!driveTokenClient){
+      driveTokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: cfg.GOOGLE_CLIENT_ID,
+        scope: "https://www.googleapis.com/auth/drive.file",
+        callback: () => {}
+      });
+    }
+    driveTokenClient.callback = (r) => r.error ? reject(new Error(r.error)) : resolve(r.access_token);
+    driveTokenClient.error_callback = (e) => reject(new Error(e.type || "popup"));
+    driveTokenClient.requestAccessToken();
+  });
+}
+
+async function uploadToDrive(){
+  const cfg = window.APP_CONFIG || {};
+  const token = await driveToken();
+  const blob = buildPDF().output("blob");
+  const meta = { name: pdfFileName(), mimeType: "application/pdf" };
+  if(cfg.DRIVE_FOLDER_ID) meta.parents = [cfg.DRIVE_FOLDER_ID];
+  const boundary = "mh" + Date.now();
+  const body = new Blob([
+    "--" + boundary + "\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n" + JSON.stringify(meta) + "\r\n",
+    "--" + boundary + "\r\nContent-Type: application/pdf\r\n\r\n", blob, "\r\n--" + boundary + "--"
+  ]);
+  const res = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink", {
+    method:"POST",
+    headers:{ Authorization:"Bearer " + token, "Content-Type":"multipart/related; boundary=" + boundary },
+    body
+  });
+  if(!res.ok) throw new Error("upload-" + res.status);
+  return res.json();
+}
+
+$("btn-drive").onclick = async () => {
+  if(!window.jspdf){ showToast("PDF tool did not load. Try Print instead."); return; }
+  const btn = $("btn-drive"), note = document.querySelector(".save-note");
+  btn.disabled = true; btn.textContent = "Saving...";
+  try{
+    const file = await uploadToDrive();
+    showToast("Saved to Drive");
+    note.innerHTML = "Saved to Drive as <strong>" + esc(file.name) + "</strong>. " +
+      (file.webViewLink ? '<a href="' + esc(file.webViewLink) + '" target="_blank" rel="noopener" style="color:var(--teal)">Open it</a>' : "");
+  }catch(e){
+    console.error(e);
+    const msg = {
+      "no-client-id":"Drive is not set up yet: add the Google client ID in config.js. Use Download PDF for now.",
+      "no-gsi":"Google sign-in did not load. Check your connection and try again.",
+      "access_denied":"Google sign-in was cancelled.",
+      "popup_closed":"Google sign-in was cancelled.",
+      "popup_failed_to_open":"The sign-in popup was blocked. Allow popups for this site and try again."
+    }[e.message] || "Could not save to Drive (" + e.message + "). Use Download PDF instead.";
+    note.textContent = msg; showToast("Drive save failed");
+  }finally{
+    btn.disabled = false; btn.textContent = "Save to Drive";
+  }
 };
 
 buildDOM();

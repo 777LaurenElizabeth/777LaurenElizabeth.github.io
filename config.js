@@ -6,5 +6,5 @@
 // 2. Paste the Web app URL below.
 // ==========================================================
 window.APP_CONFIG = {
-  APPS_SCRIPT_URL: ""
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbx3Sa1wdekZqvdkV7GD7sNIoIG9OslPG1kYba3KroDA4kHLfL8HhpbAQd8N4lhVhcCj/exec"
 };

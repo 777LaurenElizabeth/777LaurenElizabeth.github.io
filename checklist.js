@@ -744,43 +744,20 @@ $("btn-pdf").onclick = () => {
   catch(e){ console.error(e); showToast("Could not make the PDF"); }
 };
 
-let driveTokenClient = null;
-function driveToken(){
-  return new Promise((resolve, reject) => {
-    const cfg = window.APP_CONFIG || {};
-    if(!cfg.GOOGLE_CLIENT_ID) return reject(new Error("no-client-id"));
-    if(!(window.google && google.accounts && google.accounts.oauth2)) return reject(new Error("no-gsi"));
-    if(!driveTokenClient){
-      driveTokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: cfg.GOOGLE_CLIENT_ID,
-        scope: "https://www.googleapis.com/auth/drive.file",
-        callback: () => {}
-      });
-    }
-    driveTokenClient.callback = (r) => r.error ? reject(new Error(r.error)) : resolve(r.access_token);
-    driveTokenClient.error_callback = (e) => reject(new Error(e.type || "popup"));
-    driveTokenClient.requestAccessToken();
-  });
-}
-
 async function uploadToDrive(){
-  const cfg = window.APP_CONFIG || {};
-  const token = await driveToken();
-  const blob = buildPDF().output("blob");
-  const meta = { name: pdfFileName(), mimeType: "application/pdf" };
-  if(cfg.DRIVE_FOLDER_ID) meta.parents = [cfg.DRIVE_FOLDER_ID];
-  const boundary = "mh" + Date.now();
-  const body = new Blob([
-    "--" + boundary + "\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n" + JSON.stringify(meta) + "\r\n",
-    "--" + boundary + "\r\nContent-Type: application/pdf\r\n\r\n", blob, "\r\n--" + boundary + "--"
-  ]);
-  const res = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink", {
+  const url = (window.APP_CONFIG || {}).APPS_SCRIPT_URL;
+  if(!url) throw new Error("no-url");
+  const dataUri = buildPDF().output("datauristring");
+  const pdfBase64 = dataUri.slice(dataUri.lastIndexOf(",") + 1);
+  // text/plain keeps this a "simple" request, so the browser skips the CORS preflight Apps Script cannot answer.
+  const res = await fetch(url, {
     method:"POST",
-    headers:{ Authorization:"Bearer " + token, "Content-Type":"multipart/related; boundary=" + boundary },
-    body
+    headers:{ "Content-Type":"text/plain;charset=utf-8" },
+    body: JSON.stringify({ filename: pdfFileName(), pdfBase64 })
   });
-  if(!res.ok) throw new Error("upload-" + res.status);
-  return res.json();
+  const out = await res.json();
+  if(!out.ok) throw new Error(out.error || "upload-failed");
+  return out;
 }
 
 $("btn-drive").onclick = async () => {
@@ -791,17 +768,13 @@ $("btn-drive").onclick = async () => {
     const file = await uploadToDrive();
     showToast("Saved to Drive");
     note.innerHTML = "Saved to Drive as <strong>" + esc(file.name) + "</strong>. " +
-      (file.webViewLink ? '<a href="' + esc(file.webViewLink) + '" target="_blank" rel="noopener" style="color:var(--teal)">Open it</a>' : "");
+      (file.url ? '<a href="' + esc(file.url) + '" target="_blank" rel="noopener" style="color:var(--teal)">Open it</a>' : "");
   }catch(e){
     console.error(e);
-    const msg = {
-      "no-client-id":"Drive is not set up yet: add the Google client ID in config.js. Use Download PDF for now.",
-      "no-gsi":"Google sign-in did not load. Check your connection and try again.",
-      "access_denied":"Google sign-in was cancelled.",
-      "popup_closed":"Google sign-in was cancelled.",
-      "popup_failed_to_open":"The sign-in popup was blocked. Allow popups for this site and try again."
-    }[e.message] || "Could not save to Drive (" + e.message + "). Use Download PDF instead.";
-    note.textContent = msg; showToast("Drive save failed");
+    note.textContent = e.message === "no-url"
+      ? "Drive is not set up yet: add the Apps Script URL in config.js. Use Download PDF for now."
+      : "Could not save to Drive (" + e.message + "). Use Download PDF instead.";
+    showToast("Drive save failed");
   }finally{
     btn.disabled = false; btn.textContent = "Save to Drive";
   }

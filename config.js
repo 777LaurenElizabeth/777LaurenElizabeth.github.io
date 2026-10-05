@@ -1,12 +1,10 @@
 // ==========================================================
-// Google Drive settings for the "Save to Drive" button.
-// 1. Create an OAuth Client ID (type: Web application) in Google Cloud and
-//    enable the Google Drive API. Add this site as an authorized JavaScript
-//    origin: https://777laurenelizabeth.github.io
-// 2. Paste the client ID below. (A client ID is public by design; it is
-//    safe to keep in the repo. Never put a client SECRET here.)
+// "Save to Drive" settings.
+// The PDF is sent to a small Google Apps Script web app (apps-script/Code.gs)
+// that saves it into your Drive folder.
+// 1. Deploy apps-script/Code.gs as a Web app (steps are at the top of that file).
+// 2. Paste the Web app URL below.
 // ==========================================================
 window.APP_CONFIG = {
-  GOOGLE_CLIENT_ID: "",
-  DRIVE_FOLDER_ID: "1T7caoWS4-vGxigEbCMA8A1ZGbEY3EShH"
+  APPS_SCRIPT_URL: ""
 };

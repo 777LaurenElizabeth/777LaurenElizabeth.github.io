@@ -6,7 +6,11 @@
 //      Execute as: Me
 //      Who has access: Anyone
 // 3. Approve the Drive permission prompt when asked.
-// 4. Copy the Web app URL and paste it into APPS_SCRIPT_URL in config.js.
+// 4. Set the passcode: Project Settings (gear icon) > Script properties >
+//    Add script property. Name: PASSCODE. Value: the passcode you will type
+//    on the site. It lives only in Google, never in this repo. Without it,
+//    every save is refused.
+// 5. Copy the Web app URL and paste it into APPS_SCRIPT_URL in config.js.
 // After editing this code later, use Deploy > Manage deployments > Edit >
 // New version, so the URL stays the same.
 
@@ -16,6 +20,9 @@ const MAX_BASE64_CHARS = 10 * 1024 * 1024; // roughly a 7 MB PDF
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
+    const passcode = PropertiesService.getScriptProperties().getProperty("PASSCODE");
+    if (!passcode) throw new Error("Passcode is not set up in Script properties");
+    if (data.passcode !== passcode) throw new Error("Wrong passcode");
     if (!data.filename || !data.pdfBase64) throw new Error("Missing filename or PDF data");
     if (data.pdfBase64.length > MAX_BASE64_CHARS) throw new Error("PDF is too large");
 

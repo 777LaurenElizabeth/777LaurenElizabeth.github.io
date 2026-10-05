@@ -747,16 +747,24 @@ $("btn-pdf").onclick = () => {
 async function uploadToDrive(){
   const url = (window.APP_CONFIG || {}).APPS_SCRIPT_URL;
   if(!url) throw new Error("no-url");
+  let passcode = "";
+  try{ passcode = sessionStorage.getItem("drive-passcode") || ""; }catch(e){}
+  if(!passcode) passcode = prompt("Enter the passcode to save to Drive:") || "";
+  if(!passcode) throw new Error("cancelled");
   const dataUri = buildPDF().output("datauristring");
   const pdfBase64 = dataUri.slice(dataUri.lastIndexOf(",") + 1);
   // text/plain keeps this a "simple" request, so the browser skips the CORS preflight Apps Script cannot answer.
   const res = await fetch(url, {
     method:"POST",
     headers:{ "Content-Type":"text/plain;charset=utf-8" },
-    body: JSON.stringify({ filename: pdfFileName(), pdfBase64 })
+    body: JSON.stringify({ filename: pdfFileName(), pdfBase64, passcode })
   });
   const out = await res.json();
-  if(!out.ok) throw new Error(out.error || "upload-failed");
+  if(!out.ok){
+    if(out.error === "Wrong passcode"){ try{ sessionStorage.removeItem("drive-passcode"); }catch(e){} }
+    throw new Error(out.error || "upload-failed");
+  }
+  try{ sessionStorage.setItem("drive-passcode", passcode); }catch(e){}
   return out;
 }
 
@@ -773,6 +781,8 @@ $("btn-drive").onclick = async () => {
     console.error(e);
     note.textContent = e.message === "no-url"
       ? "Drive is not set up yet: add the Apps Script URL in config.js. Use Download PDF for now."
+      : e.message === "cancelled" ? "Save cancelled."
+      : e.message === "Wrong passcode" ? "That passcode was not accepted. Try again."
       : "Could not save to Drive (" + e.message + "). Use Download PDF instead.";
     showToast("Drive save failed");
   }finally{

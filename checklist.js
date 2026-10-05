@@ -12,7 +12,7 @@ const SECTIONS = [
   { id:"docs", title:"Unit Details, Documents & History", type:"details",
     fields:[
       ["Year / Make / Model"],["Class (A, B, C)"],["VIN"],["Mileage"],
-      ["Generator hours"],["Asking price"],["Length / Height / Width"],
+      ["Generator hours"],["Length / Height / Width"],
       ["GVWR and weight"],["Tank capacities: fuel, propane, fresh, gray, black",true]
     ],
     groups:[
@@ -293,34 +293,6 @@ const SECTIONS = [
       "Emergency exit window opens fully and is unobstructed",
       "Entry door and exit window latches release easily from inside"
     ]}
-  ]},
-
-  { id:"redflags", title:"Red Flags & Dealbreakers", type:"redflags",
-    intro:"Any of these is reason to walk away or to bring in a professional before negotiating further.",
-    items:[
-      "Persistent roof leaks, soft floors or visible mold",
-      "Fresh paint or caulk covering problem areas",
-      "Damaged or spliced wiring",
-      "Uneven tire wear, which can signal suspension problems",
-      "Missing or incomplete maintenance records",
-      "A branded title (salvage, flood or rebuilt) or VIN mismatches",
-      "Seller refuses an independent inspection",
-      "Engine or generator that will not start, or smokes heavily",
-      "Transmission slipping or harsh shifts",
-      "Slide-outs that bind, stall or show rot underneath"
-    ]},
-
-  { id:"issues", title:"Your Notes & Dealbreakers", type:"issues" },
-
-  { id:"pro", title:"Professional Inspection", type:"checklist",
-    intro:"This checklist helps you screen units, but it does not replace a paid professional inspection.",
-    groups:[
-    { items:[
-      "Book an NRVIA-certified RV inspector for the coach (roof, structure, systems and appliances)",
-      "Book a separate chassis or diesel mechanic for the engine, transmission and brakes, since RV inspectors focus mostly on the coach",
-      "Ask for fluid analysis (oil, coolant, transmission) on higher-mileage or diesel units",
-      "Make the purchase contingent on a satisfactory inspection"
-    ]}
   ]}
 ];
 
@@ -328,15 +300,14 @@ const SECTIONS = [
 const SHORT = {
   docs:"Documents", water:"Water & Structure", exterior:"Exterior",
   tires:"Tires & Chassis", engine:"Engine", cab:"Test Drive", electrical:"Electrical",
-  plumbing:"Plumbing", propane:"Propane & HVAC", interior:"Interior", safety:"Safety",
-  redflags:"Red Flags", issues:"My Notes", pro:"Pro Inspection"
+  plumbing:"Plumbing", propane:"Propane & HVAC", interior:"Interior", safety:"Safety"
 };
 
 // ----------------------------------------------------------
 const STORAGE_KEY = "motorhome-checklist-v1";
-const META_IDS = ["unit","seller","date","inspector"];
+const META_IDS = ["unit","seller","date","price","link"];
 const ISSUE_COLS = ["issue","location","cost"];
-const BLANK = () => ({ meta:{}, checks:{}, flags:{}, notes:{}, fields:{}, flagged:{}, issues:[], custom:{}, customSeq:0 });
+const BLANK = () => ({ meta:{}, checks:{}, flags:{}, notes:{}, fields:{}, flagged:{}, issues:[], custom:{}, customSeq:0, fv:2 });
 let state = BLANK();
 let saveTimer = null;
 
@@ -709,7 +680,18 @@ function saveState(){
 function loadState(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw) state = Object.assign(BLANK(), JSON.parse(raw));
+    if(raw){
+      const saved = JSON.parse(raw);
+      // Older saves had "Asking price" as unit-details field 5; it moved to the header.
+      if(!saved.fv){
+        const f = saved.fields || {}, nf = {};
+        Object.keys(f).forEach(k => { const n = Number(k); if(n < 5) nf[n] = f[k]; else if(n > 5) nf[n - 1] = f[k]; });
+        saved.meta = saved.meta || {};
+        if(f[5] && !saved.meta.price) saved.meta.price = f[5];
+        saved.fields = nf; saved.fv = 2;
+      }
+      state = Object.assign(BLANK(), saved);
+    }
   }catch(e){ /* nothing saved yet */ }
 
   META_IDS.forEach(k => { $("f-" + k).value = state.meta[k] || ""; });
@@ -757,7 +739,8 @@ $("btn-export").onclick = () => {
   const m = state.meta;
   L.push("MOTORHOME PURCHASE INSPECTION REPORT");
   L.push("Unit: " + (m.unit || "—") + "   Date: " + (m.date || "—"));
-  L.push("Seller: " + (m.seller || "—") + "   Inspected by: " + (m.inspector || "—"));
+  L.push("Seller: " + (m.seller || "—") + "   Asking price: " + (m.price || "—"));
+  L.push("Listing: " + (m.link || "—"));
   L.push("");
   SECTIONS.forEach((sec, si) => {
     L.push("== " + sec.title + " ==");
@@ -814,12 +797,20 @@ function buildPDF(){
   doc.text(pdfText("Unit: " + (m.unit || "-")), M, 90);
   doc.text(pdfText("Seller / Dealer: " + (m.seller || "-")), M, 105);
   doc.text(pdfText("Inspection date: " + (m.date || "-")), W / 2, 90);
-  doc.text(pdfText("Inspected by: " + (m.inspector || "-")), W / 2, 105);
+  doc.text(pdfText("Asking price: " + (m.price || "-")), W / 2, 105);
+  const link = (m.link || "").trim();
+  if(/^https?:\/\//i.test(link)){
+    doc.setTextColor(43, 138, 114);
+    doc.textWithLink(pdfText("Listing: " + link), M, 120, { url:link, maxWidth:W - 2 * M });
+    doc.setTextColor(...INK);
+  } else {
+    doc.text(pdfText("Listing: " + (link || "-")), M, 120, { maxWidth:W - 2 * M });
+  }
   const pct = total ? Math.round(done / total * 100) : 0;
   doc.setFont("helvetica", "bold");
-  doc.text(done + " of " + total + " items checked (" + pct + "%)   |   " + flagCount + " flagged", M, 128);
+  doc.text(done + " of " + total + " items checked (" + pct + "%)   |   " + flagCount + " flagged", M, 143);
 
-  let y = 142;
+  let y = 157;
   const head = (text) => ({ content:pdfText(text), colSpan:3, styles:{ fillColor:PEACH, textColor:INK, fontStyle:"bold", fontSize:10.5 } });
   const common = {
     theme:"grid", margin:{ left:M, right:M },

@@ -448,3 +448,8 @@ button.start-btn{border:0;cursor:pointer;}
 }
 button.start-btn.alt{border:2px solid var(--ink);}
 .start-btn.alt:hover,.start-btn.alt:focus-visible{background:var(--peach);color:var(--ink);}
+
+/* Red flags card on the how-to page */
+.redflags-card{border-left-color:var(--orange-deep);}
+.redflags-card .redflag-list{padding:0;margin:4px 0 0;}
+.plate-fields .pf.wide{grid-column:1/-1;}

@@ -336,7 +336,7 @@ const SHORT = {
 const STORAGE_KEY = "motorhome-checklist-v1";
 const META_IDS = ["unit","seller","date","inspector"];
 const ISSUE_COLS = ["issue","location","cost"];
-const BLANK = () => ({ meta:{}, checks:{}, flags:{}, notes:{}, fields:{}, flagged:{}, issues:[] });
+const BLANK = () => ({ meta:{}, checks:{}, flags:{}, notes:{}, fields:{}, flagged:{}, issues:[], custom:{}, customSeq:0 });
 let state = BLANK();
 let saveTimer = null;
 
@@ -345,12 +345,19 @@ function esc(s){
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+// Items in one group: the built-in ones plus any added to this form only.
+function groupItems(sec, si, gi){
+  const g = sec.groups[gi];
+  const base = g.items.map((label, ii) => ({ id:`s${si}g${gi}i${ii}`, label }));
+  const extra = (state.custom[si + "-" + gi] || []).map(c => ({ id:c.id, label:c.label, custom:true }));
+  return base.concat(extra);
+}
+
 // Flatten the checklist items so we can count and look them up.
 function checklistItems(sec, si){
   const out = [];
-  (sec.groups || []).forEach((g, gi) => {
-    g.items.forEach((label, ii) => out.push({ id:`s${si}g${gi}i${ii}`, label, group:g.title || "" }));
-  });
+  (sec.groups || []).forEach((g, gi) => groupItems(sec, si, gi).forEach(it =>
+    out.push(Object.assign({ group:g.title || "" }, it))));
   return out;
 }
 
@@ -364,31 +371,50 @@ function itemHTML(it){
         <div class="item-tools">
           <button type="button" class="tool-btn" data-act="flag" aria-pressed="false">⚑ Flag</button>
           <button type="button" class="tool-btn" data-act="note">+ Note</button>
+          ${it.custom ? '<button type="button" class="tool-btn del-custom" aria-label="Remove this item">✕</button>' : ""}
         </div>
       </div>
-      <div class="note-box">
-        <textarea placeholder="Details, measurements, photo reminder..."></textarea>
+      <div class="note-preview" data-act="note" hidden></div>
+    </div>`;
+}
+
+function subsectionHTML(key, title, inner){
+  return `
+    <div class="subsection collapsed" id="sub-${key}">
+      <div class="sub-head" role="button" tabindex="0" aria-expanded="false">
+        <span class="sub-title">${esc(title)}</span>
+        <span class="sub-right"><span class="sub-count" id="subcount-${key}"></span><span class="chevron">▾</span></span>
       </div>
+      <div class="sub-body">${inner}</div>
     </div>`;
 }
 
 function buildSection(sec, si){
   const el = document.createElement("div");
-  el.className = "section" + (sec.type === "redflags" ? " redflags" : "");
+  el.className = "section collapsed" + (sec.type === "redflags" ? " redflags" : "");
   el.id = "sec-" + si;
   let body = "";
   if(sec.intro) body += `<div class="section-intro">${esc(sec.intro)}</div>`;
 
   if(sec.type === "details"){
-    body += `<div class="field-grid">` + sec.fields.map((f, fi) =>
+    const grid = `<div class="field-grid">` + sec.fields.map((f, fi) =>
       `<div class="pf${f[1] ? " wide" : ""}"><label for="fd-${fi}">${esc(f[0])}</label><input id="fd-${fi}" data-field="${fi}"></div>`
     ).join("") + `</div>`;
+    body += subsectionHTML(si + "-f", "Unit details", grid);
   }
 
   (sec.groups || []).forEach((g, gi) => {
-    if(g.title) body += `<div class="group-title">${esc(g.title)}</div>`;
-    if(g.intro) body += `<div class="section-intro">${esc(g.intro)}</div>`;
-    body += g.items.map((label, ii) => itemHTML({ id:`s${si}g${gi}i${ii}`, label })).join("");
+    const inner = (g.intro ? `<div class="section-intro">${esc(g.intro)}</div>` : "") +
+      `<div id="items-${si}-${gi}"></div>
+       <div class="add-area" data-group="${si}-${gi}">
+         <button type="button" class="add-item-btn">+ Add item</button>
+         <div class="add-form" hidden>
+           <input class="add-input" placeholder="Describe the item..." aria-label="New item">
+           <button type="button" class="add-confirm">Add</button>
+           <button type="button" class="add-cancel">Done</button>
+         </div>
+       </div>`;
+    body += g.title ? subsectionHTML(si + "-" + gi, g.title, inner) : inner;
   });
 
   if(sec.type === "redflags"){
@@ -409,7 +435,7 @@ function buildSection(sec, si){
   }
 
   el.innerHTML = `
-    <div class="section-head" role="button" tabindex="0" aria-expanded="true">
+    <div class="section-head" role="button" tabindex="0" aria-expanded="false">
       <div class="section-head-left">
         <span class="section-num">${String(si + 1).padStart(2, "0")}</span>
         <span class="section-title">${esc(sec.title)}</span>
@@ -428,6 +454,63 @@ function buildSection(sec, si){
   return el;
 }
 
+function renderGroupItems(si, gi){
+  const box = $(`items-${si}-${gi}`);
+  if(!box) return;
+  box.innerHTML = groupItems(SECTIONS[si], si, gi).map(itemHTML).join("");
+  box.querySelectorAll(".item").forEach(it => refreshItem(it.dataset.id));
+}
+function renderGroups(){
+  SECTIONS.forEach((sec, si) => (sec.groups || []).forEach((g, gi) => renderGroupItems(si, gi)));
+}
+
+function toggleSub(head){
+  const sub = head.parentElement;
+  sub.classList.toggle("collapsed");
+  head.setAttribute("aria-expanded", String(!sub.classList.contains("collapsed")));
+}
+
+// ---- Items added to this form only ----
+function closeAddForm(area){
+  area.querySelector(".add-form").hidden = true;
+  area.querySelector(".add-item-btn").hidden = false;
+}
+function addCustomItem(area){
+  const input = area.querySelector(".add-input"), label = input.value.trim();
+  if(!label){ input.focus(); return; }
+  const key = area.dataset.group, parts = key.split("-").map(Number);
+  state.customSeq = (state.customSeq || 0) + 1;
+  (state.custom[key] = state.custom[key] || []).push({ id:`s${parts[0]}g${parts[1]}c${state.customSeq}`, label });
+  input.value = "";
+  renderGroupItems(parts[0], parts[1]); refreshCounts(); scheduleSave();
+  input.focus(); // stay open so several items can be added in a row
+}
+function removeCustomItem(id){
+  const m = /^s(\d+)g(\d+)c/.exec(id);
+  if(!m || !confirm("Remove this item from this form?")) return;
+  const key = m[1] + "-" + m[2];
+  state.custom[key] = (state.custom[key] || []).filter(c => c.id !== id);
+  delete state.checks[id]; delete state.flagged[id]; delete state.notes[id];
+  renderGroupItems(Number(m[1]), Number(m[2])); refreshCounts(); scheduleSave();
+}
+
+// ---- Note pop-up ----
+let noteId = null;
+function openNote(id){
+  noteId = id;
+  const lab = document.querySelector(`.item[data-id="${id}"] .item-label`);
+  $("note-title").textContent = lab ? lab.textContent : "";
+  $("note-text").value = state.notes[id] || "";
+  $("note-modal").hidden = false;
+  document.body.classList.add("modal-open");
+  setTimeout(() => $("note-text").focus(), 50);
+}
+function closeNote(){
+  $("note-modal").hidden = true;
+  document.body.classList.remove("modal-open");
+  noteId = null;
+}
+
 function buildDOM(){
   const sectionsEl = $("sections"), nav = $("nav-scroll");
   SECTIONS.forEach((sec, si) => {
@@ -439,6 +522,7 @@ function buildDOM(){
     chip.onclick = () => {
       const s = $("sec-" + si);
       s.classList.remove("collapsed");
+      s.querySelector(".section-head").setAttribute("aria-expanded", "true");
       s.scrollIntoView({ behavior:"smooth", block:"start" });
     };
     nav.appendChild(chip);
@@ -453,24 +537,43 @@ function buildDOM(){
     refreshItem(id); refreshCounts(); scheduleSave();
   });
   sectionsEl.addEventListener("click", (e) => {
-    const btn = e.target.closest(".tool-btn");
+    const sub = e.target.closest(".sub-head");
+    if(sub){ toggleSub(sub); return; }
+    const addBtn = e.target.closest(".add-item-btn");
+    if(addBtn){
+      const area = addBtn.closest(".add-area");
+      addBtn.hidden = true; area.querySelector(".add-form").hidden = false;
+      area.querySelector(".add-input").focus();
+      return;
+    }
+    const cancel = e.target.closest(".add-cancel");
+    if(cancel){ closeAddForm(cancel.closest(".add-area")); return; }
+    const confirmBtn = e.target.closest(".add-confirm");
+    if(confirmBtn){ addCustomItem(confirmBtn.closest(".add-area")); return; }
+    const delItem = e.target.closest(".del-custom");
+    if(delItem){ removeCustomItem(delItem.closest(".item").dataset.id); return; }
+    const btn = e.target.closest("[data-act]");
     if(!btn) return;
-    const item = btn.closest(".item"), id = item.dataset.id;
+    const id = btn.closest(".item").dataset.id;
     if(btn.dataset.act === "flag"){
       if(state.flagged[id]) delete state.flagged[id]; else state.flagged[id] = 1;
       refreshItem(id); refreshCounts(); scheduleSave();
     } else {
-      item.querySelector(".note-box").classList.toggle("open");
+      openNote(id);
+    }
+  });
+  sectionsEl.addEventListener("keydown", (e) => {
+    const sub = e.target.closest(".sub-head");
+    if(sub && e.target === sub && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); toggleSub(sub); return; }
+    if(e.target.classList.contains("add-input")){
+      if(e.key === "Enter"){ e.preventDefault(); addCustomItem(e.target.closest(".add-area")); }
+      else if(e.key === "Escape"){ closeAddForm(e.target.closest(".add-area")); }
     }
   });
   sectionsEl.addEventListener("input", (e) => {
-    const item = e.target.closest(".item");
-    if(item && e.target.tagName === "TEXTAREA"){
-      state.notes[item.dataset.id] = e.target.value;
-      refreshCounts(); scheduleSave();
-    } else if(e.target.dataset.field !== undefined){
+    if(e.target.dataset.field !== undefined){
       state.fields[e.target.dataset.field] = e.target.value;
-      scheduleSave();
+      refreshCounts(); scheduleSave();
     } else if(e.target.closest(".issues")){
       readIssues(); scheduleSave();
     }
@@ -485,6 +588,17 @@ function buildDOM(){
     state.issues.splice(Number(del.dataset.row), 1);
     renderIssues(); scheduleSave();
   });
+
+  // Note pop-up controls
+  $("note-text").oninput = (e) => {
+    if(!noteId) return;
+    if(e.target.value) state.notes[noteId] = e.target.value; else delete state.notes[noteId];
+    refreshItem(noteId); refreshCounts(); scheduleSave();
+  };
+  $("note-done").onclick = closeNote;
+  $("note-clear").onclick = () => { $("note-text").value = ""; $("note-text").dispatchEvent(new Event("input")); $("note-text").focus(); };
+  $("note-modal").addEventListener("click", (e) => { if(e.target.id === "note-modal") closeNote(); });
+  document.addEventListener("keydown", (e) => { if(e.key === "Escape" && !$("note-modal").hidden) closeNote(); });
 }
 
 // ---------------- Issues table ----------------
@@ -519,12 +633,15 @@ function refreshItem(id){
   item.classList.toggle("checked", checked);
   item.classList.toggle("flagged", flagged);
   item.querySelector("input[type=checkbox]").checked = checked;
-  const fb = item.querySelector('[data-act="flag"]');
+  const fb = item.querySelector('.tool-btn[data-act="flag"]');
   fb.classList.toggle("on", flagged);
   fb.setAttribute("aria-pressed", String(flagged));
-  const note = state.notes[id];
-  const nb = item.querySelector(".note-box");
-  if(note){ item.querySelector("textarea").value = note; nb.classList.add("open"); }
+  const note = state.notes[id] || "";
+  const prev = item.querySelector(".note-preview");
+  prev.textContent = note; prev.hidden = !note;
+  const nb = item.querySelector('.tool-btn[data-act="note"]');
+  nb.textContent = note ? "✎ Note" : "+ Note";
+  nb.classList.toggle("has-note", !!note);
 }
 
 function refreshCounts(){
@@ -541,6 +658,17 @@ function refreshCounts(){
         flagged.push({ sec:sec.title, label:it.label, note:state.notes[it.id] || "" });
       }
     });
+    (sec.groups || []).forEach((g, gi) => {
+      if(!g.title) return;
+      const its = groupItems(sec, si, gi), d = its.filter(it => state.checks[it.id]).length;
+      $(`subcount-${si}-${gi}`).textContent = d + "/" + its.length;
+      $(`sub-${si}-${gi}`).classList.toggle("is-complete", its.length > 0 && d === its.length);
+    });
+    if(sec.type === "details"){
+      const filled = sec.fields.filter((f, fi) => (state.fields[fi] || "").trim()).length;
+      $(`subcount-${si}-f`).textContent = filled + "/" + sec.fields.length;
+      $(`sub-${si}-f`).classList.toggle("is-complete", filled === sec.fields.length);
+    }
     const countEl = $("count-" + si);
     if(items.length){
       countEl.textContent = secDone + "/" + items.length;
@@ -586,7 +714,7 @@ function loadState(){
 
   META_IDS.forEach(k => { $("f-" + k).value = state.meta[k] || ""; });
   document.querySelectorAll("[data-field]").forEach(inp => { inp.value = state.fields[inp.dataset.field] || ""; });
-  document.querySelectorAll(".item").forEach(it => refreshItem(it.dataset.id));
+  renderGroups();
   renderIssues();
   refreshCounts();
 }
@@ -602,18 +730,20 @@ META_IDS.forEach(k => {
   $("f-" + k).oninput = (e) => { state.meta[k] = e.target.value; scheduleSave(); };
 });
 
-$("btn-collapse").onclick = () => document.querySelectorAll(".section").forEach(s => s.classList.add("collapsed"));
-$("btn-expand").onclick = () => document.querySelectorAll(".section").forEach(s => s.classList.remove("collapsed"));
+function setAllCollapsed(on){
+  document.querySelectorAll(".section, .subsection").forEach(el => el.classList.toggle("collapsed", on));
+  document.querySelectorAll(".section-head, .sub-head").forEach(h => h.setAttribute("aria-expanded", String(!on)));
+}
+$("btn-collapse").onclick = () => setAllCollapsed(true);
+$("btn-expand").onclick = () => setAllCollapsed(false);
 $("btn-print").onclick = () => window.print();
 
 $("btn-reset").onclick = () => {
   if(!confirm("Reset all checkmarks, flags, notes and fields? This cannot be undone.")) return;
   state = BLANK();
-  document.querySelectorAll(".note-box.open").forEach(n => n.classList.remove("open"));
-  document.querySelectorAll(".item textarea").forEach(t => { t.value = ""; });
   META_IDS.forEach(k => { $("f-" + k).value = ""; });
   document.querySelectorAll("[data-field]").forEach(i => { i.value = ""; });
-  document.querySelectorAll(".item").forEach(it => refreshItem(it.dataset.id));
+  renderGroups();
   renderIssues();
   refreshCounts();
   saveState();
@@ -703,8 +833,7 @@ function buildPDF(){
     }
     (sec.groups || []).forEach((g, gi) => {
       if(g.title) rows.push([{ content:pdfText(g.title), colSpan:3, styles:{ fontStyle:"bold", textColor:TEAL } }]);
-      g.items.forEach((label, ii) => {
-        const id = `s${si}g${gi}i${ii}`;
+      groupItems(sec, si, gi).forEach(({ id, label }) => {
         const status = state.flagged[id] ? "FLAG" : (state.checks[id] ? "[X]" : "[ ]");
         const row = [{ content:status, styles: state.flagged[id] ? { textColor:ORANGE } : {} }, pdfText(label), pdfText(state.notes[id] || "")];
         rows.push(row);

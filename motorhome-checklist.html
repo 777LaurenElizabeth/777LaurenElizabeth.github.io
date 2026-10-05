@@ -93,6 +93,16 @@
   </div>
 
   <footer>Saved automatically to this device as you go · Motorhome Purchase Checklist</footer>
+  <div class="note-modal" id="note-modal" hidden>
+    <div class="note-sheet" role="dialog" aria-modal="true" aria-labelledby="note-title">
+      <div class="note-item-label" id="note-title"></div>
+      <textarea id="note-text" placeholder="Details, measurements, photo reminder..."></textarea>
+      <div class="sheet-btns">
+        <button type="button" class="sheet-btn primary" id="note-done">Done</button>
+        <button type="button" class="sheet-btn" id="note-clear">Clear note</button>
+      </div>
+    </div>
+  </div>
   <div class="save-toast" id="toast" role="status">Saved</div>
 
   <script src="vendor/jspdf.umd.min.js"></script>

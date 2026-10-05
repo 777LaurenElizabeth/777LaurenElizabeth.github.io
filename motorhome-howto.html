@@ -21,7 +21,6 @@
       <a class="back-link" href="index.html">← Home</a>
       <p class="plate-eyebrow">Before you start</p>
       <h1 class="plate-title">How to use this checklist</h1>
-      <a class="start-btn" href="motorhome-checklist.html">Get started with your checklist →</a>
     </div>
   </div>
 
@@ -32,8 +31,8 @@
       <ol class="steps">
         <li><strong>Pack the bag.</strong> Use the <em>Items to bring</em> list below so you have everything in hand
           when you arrive.</li>
-        <li><strong>Confirm what the seller will have ready.</strong> Check the <em>Items to have</em> list below, ideally
-          before you drive out.</li>
+        <li><strong>Ask the seller to have the unit ready.</strong> Shore power, water, propane and fuel available, so
+          every system can be tested live.</li>
         <li><strong>Open the checklist and fill in the top card.</strong> Add the unit, seller, date and who is
           inspecting.</li>
         <li><strong>Work through each section in order.</strong> Tick items as you go. An inspection is not a race, so
@@ -48,95 +47,29 @@
         PDF first and then use <em>Reset All</em>, so the details do not blur together.</p>
     </div>
 
-    <div class="section" id="bring">
-      <div class="section-head static">
-        <div class="section-head-left">
-          <span class="section-num">01</span>
-          <span class="section-title">Items to bring</span>
-        </div>
-        <span class="section-count" id="bring-count"></span>
-      </div>
-      <div class="section-body" id="bring-list"></div>
+    <div class="card-note">
+      <h3>Items to bring</h3>
+      <ul class="bring-list">
+        <li>Printed or digital copy of this checklist</li>
+        <li>Gloves for opening access panels and bays</li>
+        <li>Flashlight</li>
+        <li>Plug-in 110V outlet tester</li>
+        <li>Multimeter for battery voltage</li>
+        <li>Moisture meter</li>
+        <li>Tire tread depth gauge and tire pressure gauge</li>
+        <li>Phone or camera for photos of problem areas and data plates</li>
+        <li>Step ladder if the roof is walkable and the seller allows access</li>
+      </ul>
     </div>
 
-    <div class="section" id="have">
-      <div class="section-head static">
-        <div class="section-head-left">
-          <span class="section-num">02</span>
-          <span class="section-title">Items to have</span>
-        </div>
-        <span class="section-count" id="have-count"></span>
-      </div>
-      <div class="section-body">
-        <div class="section-intro">Ask the seller to have these ready so every system can be tested live and you can
-          verify the paperwork.</div>
-        <div id="have-list"></div>
-      </div>
-    </div>
-
-    <div class="start-card">
-      <h2>Ready to create your checklist?</h2>
-      <p>You will be taken to the full inspection, with your progress saved as you go.</p>
-      <a class="start-btn" href="motorhome-checklist.html">Get started with your checklist →</a>
+    <div class="start-wrap">
+      <a class="start-btn" href="motorhome-checklist.html">Get started with your checklist</a>
     </div>
 
   </div>
 
-  <footer>Packing ticks save to this device · Motorhome Purchase Checklist</footer>
+  <footer>Motorhome Purchase Checklist</footer>
 
-  <script>
-    // To change either list, edit the arrays below.
-    const BRING = [
-      "Printed or digital copy of this checklist",
-      "Gloves for opening access panels and bays",
-      "Flashlight",
-      "Plug-in 110V outlet tester",
-      "Multimeter for battery voltage",
-      "Moisture meter",
-      "Tire tread depth gauge and tire pressure gauge",
-      "Phone or camera for photos of problem areas and data plates",
-      "Step ladder if the roof is walkable and the seller allows access"
-    ];
-    const HAVE = [
-      "Unit on shore power",
-      "Fresh water available, so the pump and plumbing can be tested",
-      "Propane tank filled, for the stove, fridge, furnace and water heater",
-      "Fuel in the tank, for the engine, generator and test drive",
-      "Engine cold when you arrive, so you can hear a cold start",
-      "Clean title, in hand or a photo of it",
-      "Maintenance records and receipts",
-      "Owner manuals for the coach and major appliances",
-      "Registration, current",
-      "Keys for every lock, including storage bays",
-      "Permission to walk the roof, or a ladder, and to test drive"
-    ];
-
-    const KEY = "motorhome-howto-v1";
-    let ticks = {};
-    try { ticks = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { }
-
-    function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
-
-    function render(listId, countId, prefix, items) {
-      document.getElementById(listId).innerHTML = items.map((label, i) => {
-        const id = prefix + i;
-        return `<div class="item${ticks[id] ? " checked" : ""}"><div class="item-row">
-          <input type="checkbox" id="c-${id}" data-id="${id}"${ticks[id] ? " checked" : ""}>
-          <label class="item-label" for="c-${id}">${esc(label)}</label></div></div>`;
-      }).join("");
-      const n = items.filter((_, i) => ticks[prefix + i]).length;
-      document.getElementById(countId).textContent = n + "/" + items.length;
-    }
-    function renderAll() { render("bring-list", "bring-count", "b", BRING); render("have-list", "have-count", "h", HAVE); }
-
-    document.addEventListener("change", (e) => {
-      if (e.target.type !== "checkbox" || !e.target.dataset.id) return;
-      if (e.target.checked) ticks[e.target.dataset.id] = 1; else delete ticks[e.target.dataset.id];
-      try { localStorage.setItem(KEY, JSON.stringify(ticks)); } catch (err) { }
-      renderAll();
-    });
-    renderAll();
-  </script>
 </body>
 
 </html>

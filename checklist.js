@@ -1,313 +1,307 @@
 // ==========================================================
 // Motorhome Purchase Checklist
 // To change the checklist, edit the SECTIONS data below.
-// (The "what to bring" list lives on motorhome-howto.html.)
+// (The "what to bring" and red flags lists live on motorhome-howto.html.)
+// Each section has numbered subsections ("groups"), each with tick-able items.
 //   type "checklist" -> groups of tick-able items
-//   type "details"   -> fill-in fields (plus optional groups)
-//   type "redflags"  -> read-only list of dealbreakers
-//   type "issues"    -> editable table of problems found
+//   type "details"   -> fill-in fields, then the groups
+// An item is either a plain string, or ["text", "stable-id"]. The id is what a
+// saved checklist remembers, so keep it if you reword or move an item.
 // ==========================================================
 
 const SECTIONS = [
-  { id:"docs", title:"Unit Details, Documents & History", type:"details",
-    fields:[
-      ["Year / Make / Model"],["Class (A, B, C)"],["VIN"],["Mileage"],
-      ["Generator hours"],["Length / Height / Width"],
-      ["GVWR and weight"],["Tank capacities: fuel, propane, fresh, gray, black",true]
-    ],
-    groups:[
-    { items:[
-      "VIN on the title matches the VIN on the chassis and the coach data plate",
-      "Title is clean, with no salvage, flood or rebuilt brand",
-      "Run a title history report before committing",
-      "Federal Certification Label is present and legible",
-      "RVIA seal is present (indicates the unit was built to NFPA 1192 standards for propane, detectors and egress windows)",
-      "Maintenance records and receipts are available",
-      "Owner manuals for the coach and major appliances are included",
-      "Check for open recalls on both the chassis and the coach",
-      "Registration is current",
-      "Ask why the seller is selling, how often the unit was used, and how it was stored",
-      "Ask about any accidents, leaks or major repairs"
+  { id:"docs", title:"Unit Details, Documents & History", type:"details", fields:[["Year / Make / Model"],
+      ["Class (A, B, C)"],
+      ["VIN"],
+      ["Mileage"],
+      ["Generator hours"],
+      ["Length / Height / Width"],
+      ["GVWR and weight"],
+      ["Tank capacities: fuel, propane, fresh, gray, black",true]], groups:[
+    { title:"Paperwork & History", items:[
+      ["VIN on the title matches the VIN on the chassis and the coach data plate","s0g0i0"],
+      ["Title is clean, with no salvage, flood or rebuilt brand","s0g0i1"],
+      ["Run a title history report before committing","s0g0i2"],
+      ["Federal Certification Label is present and legible","s0g0i3"],
+      ["RVIA seal is present (indicates the unit was built to NFPA 1192 standards for propane, detectors and egress windows)","s0g0i4"],
+      ["Maintenance records and receipts are available","s0g0i5"],
+      ["Owner manuals for the coach and major appliances are included","s0g0i6"],
+      ["Check for open recalls on both the chassis and the coach","s0g0i7"],
+      ["Registration is current","s0g0i8"],
+      ["Ask why the seller is selling, how often the unit was used, and how it was stored","s0g0i9"],
+      ["Ask about any accidents, leaks or major repairs","s0g0i10"]
     ]}
   ]},
 
-  { id:"water", title:"Water Intrusion & Structure", type:"checklist",
-    intro:"Water damage is the most expensive problem to find after purchase. Any notable sign of a leak that was not properly repaired can be reason to walk away.",
-    groups:[
-    { title:"Ceilings and walls", items:[
-      "Press on ceilings for softness, especially near vents, AC units and roof penetrations",
-      "Look for stains, ripples or delamination on interior walls",
-      "Check wall bases at floor level for discoloration or softness",
-      "Look inside upper cabinets for water marks on the woodwork",
-      "Use a moisture meter along seams, corners and around openings"
+  { id:"exterior", title:"Exterior Walkaround", type:"checklist", intro:"Walk around the whole unit first, then look up at the roof and down at the tires and underside.", groups:[
+    { title:"Body & Paint", items:[
+      ["Walk around the full unit and note dents, scrapes and cracks","s2g0i0"],
+      ["Look for mismatched paint or fresh paint that may hide repairs","s2g0i1"],
+      ["Check front cap and rear cap for cracks or stress lines","s2g0i2"],
+      ["Check decals and graphics for fading or peeling","s2g0i3"]
     ]},
-    { title:"Windows and openings", items:[
-      "Look for stains on flooring or carpet under each window",
-      "Press around each window frame for soft spots",
-      "Check door frames and the entry step area"
+    { title:"Windows & Doors", items:[
+      ["Windows open, close and lock, with tight seals and no cracks","s2g1i0"],
+      ["Entry door and screen door open, close and latch properly","s2g1i1"],
+      ["Door locks and keys work for every lock, including bays","s2g1i2"]
     ]},
-    { title:"Windshield", items:[
-      "Push gently on the windshield and watch for movement",
-      "Look for gaps or holes in the adhesive around the windshield",
-      "Check the cab ceiling and dash area above the windshield for water marks"
-    ]},
-    { title:"Floors", items:[
-      "Walk the entire floor and feel for soft or spongy spots",
-      "Pay attention in front of the toilet, shower, sinks and entry door",
-      "From outside, look up inside the storage bays at the underside of the floor for discoloration or rot"
-    ]},
-    { title:"Exterior walls", items:[
-      "Look down each sidewall from an angle for bubbling or delamination",
-      "Look for cracks or discoloration in fiberglass and around seams"
+    { title:"Exterior Walls", items:[
+      ["Look down each sidewall from an angle for bubbling or delamination","s1g4i0"],
+      ["Look for cracks or discoloration in fiberglass and around seams","s1g4i1"]
     ]},
     { title:"Roof", intro:"Most leaks start on the roof. Confirm with the seller that the roof is walkable before going up; if not, inspect from a ladder at each corner.", items:[
-      "Identify the roof material (rubber, TPO, fiberglass or aluminum) and ask its age",
-      "Look for cracks, tears, bubbles or loose membrane",
-      "Inspect sealant around every vent, AC unit, skylight, antenna and solar mount",
-      "Note cracked, dried or peeling sealant",
-      "Check roof seams and the edge trim along both sides, front and rear",
-      "Look for fresh caulk or patches that could be covering a past leak, and ask about them",
-      "Check that the roof ladder is secure with no movement",
-      "Look for pooling water marks or debris buildup",
-      "Ask when the roof was last resealed or recoated"
-    ]}
-  ]},
-
-  { id:"exterior", title:"Exterior, Slide-outs & Awnings", type:"checklist", groups:[
-    { title:"Body and paint", items:[
-      "Walk around the full unit and note dents, scrapes and cracks",
-      "Look for mismatched paint or fresh paint that may hide repairs",
-      "Check front cap and rear cap for cracks or stress lines",
-      "Check decals and graphics for fading or peeling"
+      ["Identify the roof material (rubber, TPO, fiberglass or aluminum) and ask its age","s1g5i0"],
+      ["Look for cracks, tears, bubbles or loose membrane","s1g5i1"],
+      ["Inspect sealant around every vent, AC unit, skylight, antenna and solar mount","s1g5i2"],
+      ["Note cracked, dried or peeling sealant","s1g5i3"],
+      ["Check roof seams and the edge trim along both sides, front and rear","s1g5i4"],
+      ["Look for fresh caulk or patches that could be covering a past leak, and ask about them","s1g5i5"],
+      ["Check that the roof ladder is secure with no movement","s1g5i6"],
+      ["Look for pooling water marks or debris buildup","s1g5i7"],
+      ["Ask when the roof was last resealed or recoated","s1g5i8"]
     ]},
-    { title:"Windows and doors", items:[
-      "Windows open, close and lock, with tight seals and no cracks",
-      "Entry door and screen door open, close and latch properly",
-      "Door locks and keys work for every lock, including bays"
+    { title:"Windshield", items:[
+      ["Push gently on the windshield and watch for movement","s1g2i0"],
+      ["Look for gaps or holes in the adhesive around the windshield","s1g2i1"],
+      ["Check the cab ceiling and dash area above the windshield for water marks","s1g2i2"]
     ]},
     { title:"Slide-outs", items:[
-      "Extend and retract each slide fully, listening for grinding or straining",
-      "Slide moves smoothly and evenly, without stopping or tilting",
-      "Seals and wipers are intact and seat tightly when open and closed",
-      "Inspect the slide floor and underside for rot or soft spots",
-      "Check slide toppers for tears"
+      ["Extend and retract each slide fully, listening for grinding or straining","s2g2i0"],
+      ["Slide moves smoothly and evenly, without stopping or tilting","s2g2i1"],
+      ["Seals and wipers are intact and seat tightly when open and closed","s2g2i2"],
+      ["Inspect the slide floor and underside for rot or soft spots","s2g2i3"],
+      ["Check slide toppers for tears","s2g2i4"]
     ]},
     { title:"Awnings", items:[
-      "Open and close each awning as designed, manual or powered",
-      "Inspect the fabric for tears, mildew or sun damage while open",
-      "Check arms and hardware for bends or loose mounts"
+      ["Open and close each awning as designed, manual or powered","s2g3i0"],
+      ["Inspect the fabric for tears, mildew or sun damage while open","s2g3i1"],
+      ["Check arms and hardware for bends or loose mounts","s2g3i2"]
     ]},
-    { title:"Steps, bays and accessories", items:[
-      "Entry steps extend and retract smoothly, manual or motorized",
-      "Storage bay doors open, close and latch, with dry interiors",
-      "Exterior lights, marker lights and porch light work",
-      "Hitch and tow wiring work, if you plan to tow a car"
-    ]}
-  ]},
-
-  { id:"tires", title:"Tires, Chassis & Undercarriage", type:"checklist", groups:[
+    { title:"Steps, Bays & Accessories", items:[
+      ["Entry steps extend and retract smoothly, manual or motorized","s2g4i0"],
+      ["Storage bay doors open, close and latch, with dry interiors","s2g4i1"],
+      ["Exterior lights, marker lights and porch light work","s2g4i2"],
+      ["Hitch and tow wiring work, if you plan to tow a car","s2g4i3"]
+    ]},
     { title:"Tires", items:[
-      "Read the DOT date code on every tire; tires older than about 5 years are due for replacement regardless of tread",
-      "Check all tires, including the inner tires on the duals and the spare",
-      "Look for dry rot or cracking on the sidewalls",
-      "Measure tread depth on each tire",
-      "Look for uneven wear, which can signal suspension or alignment problems",
-      "Check tire pressures against the placard",
-      "Confirm all tires are the same size and load rating"
+      ["Read the DOT date code on every tire; tires older than about 5 years are due for replacement regardless of tread","s3g0i0"],
+      ["Check all tires, including the inner tires on the duals and the spare","s3g0i1"],
+      ["Look for dry rot or cracking on the sidewalls","s3g0i2"],
+      ["Measure tread depth on each tire","s3g0i3"],
+      ["Look for uneven wear, which can signal suspension or alignment problems","s3g0i4"],
+      ["Check tire pressures against the placard","s3g0i5"],
+      ["Confirm all tires are the same size and load rating","s3g0i6"]
     ]},
-    { title:"Frame and running gear", items:[
-      "Inspect the frame for rust, cracks or welds that suggest repairs",
-      "Check suspension components, springs or airbags, and shocks",
-      "Look for fluid leaks on the ground under the unit",
-      "Inspect brake lines and visible brake components",
-      "Check exhaust system for rust, holes or loose hangers",
-      "Inspect the underbelly for damage, missing covering or rodent entry points",
-      "Leveling jacks extend, hold and retract fully, with no leaks"
+    { title:"Frame & Undercarriage", items:[
+      ["Inspect the frame for rust, cracks or welds that suggest repairs","s3g1i0"],
+      ["Check suspension components, springs or airbags, and shocks","s3g1i1"],
+      ["Look for fluid leaks on the ground under the unit","s3g1i2"],
+      ["Inspect brake lines and visible brake components","s3g1i3"],
+      ["Check exhaust system for rust, holes or loose hangers","s3g1i4"],
+      ["Inspect the underbelly for damage, missing covering or rodent entry points","s3g1i5"],
+      ["Leveling jacks extend, hold and retract fully, with no leaks","s3g1i6"]
     ]}
   ]},
 
-  { id:"engine", title:"Engine & Drivetrain", type:"checklist",
-    intro:"If possible, ask the seller not to start the engine before you arrive, so you can hear a cold start.",
-    groups:[
-    { title:"Before starting", items:[
-      "Note engine type (gas or diesel) and whether it is front or rear mounted",
-      "Check engine oil level and condition",
-      "Check transmission fluid level and color",
-      "Check coolant level and condition",
-      "Check brake fluid and power steering fluid",
-      "Look for fluid leaks under the engine and transmission",
-      "Inspect belts for cracking or glazing",
-      "Inspect hoses for cracks, bulges or soft spots",
-      "Check the engine compartment for rodent nests or chewed wiring",
-      "Check chassis battery terminals for corrosion"
+  { id:"engine", title:"Engine & Under the Hood", type:"checklist", intro:"If possible, ask the seller not to start the engine before you arrive, so you can hear a cold start.", groups:[
+    { title:"Before Starting", items:[
+      ["Note engine type (gas or diesel) and whether it is front or rear mounted","s4g0i0"],
+      ["Check engine oil level and condition","s4g0i1"],
+      ["Check transmission fluid level and color","s4g0i2"],
+      ["Check coolant level and condition","s4g0i3"],
+      ["Check brake fluid and power steering fluid","s4g0i4"],
+      ["Look for fluid leaks under the engine and transmission","s4g0i5"],
+      ["Inspect belts for cracking or glazing","s4g0i6"],
+      ["Inspect hoses for cracks, bulges or soft spots","s4g0i7"],
+      ["Check the engine compartment for rodent nests or chewed wiring","s4g0i8"],
+      ["Check chassis battery terminals for corrosion","s4g0i9"]
     ]},
     { title:"Running", items:[
-      "Engine starts promptly on the chassis battery without hesitation",
-      "Listen for knocking, ticking or irregular idle",
-      "Watch for excessive smoke from the exhaust",
-      "Note any warning lights on the dash",
-      "Ask for oil change, transmission service and coolant service history"
+      ["Engine starts promptly on the chassis battery without hesitation","s4g1i0"],
+      ["Listen for knocking, ticking or irregular idle","s4g1i1"],
+      ["Watch for excessive smoke from the exhaust","s4g1i2"],
+      ["Note any warning lights on the dash","s4g1i3"],
+      ["Ask for oil change, transmission service and coolant service history","s4g1i4"]
     ]}
   ]},
 
-  { id:"cab", title:"Cab, Cockpit & Test Drive", type:"checklist", groups:[
-    { title:"Cab and cockpit", items:[
-      "All gauges work, including fuel, temperature, oil pressure and speedometer",
-      "Headlights, high beams, turn signals, brake lights and hazards work",
-      "Horn, wipers and washer fluid work",
-      "Dash AC and heat work",
-      "Driver and passenger seats adjust and swivel if equipped",
-      "Seat belts latch and retract",
-      "Cab door locks and windows operate correctly",
-      "Backup camera and side cameras work",
-      "Mirrors adjust, including powered or heated mirrors",
-      "Dash radio and any navigation work"
+  { id:"interior", title:"Interior", type:"checklist", groups:[
+    { title:"First Impressions", items:[
+      ["Note any musty smell, which can point to hidden water damage or mold","s9g0i0"],
+      ["Look for signs of rodents or insects, including droppings and chewed materials","s9g0i1"],
+      ["Check for smoke or pet odors","s9g0i2"],
+      ["Cabinets and drawers open, close and latch for travel","s9g0i3"],
+      ["Blinds and shades raise, lower and stay in place","s9g0i4"],
+      ["Upholstery, cushions and flooring are in acceptable condition","s9g0i5"]
     ]},
-    { title:"Test drive", items:[
-      "Drive at both low speed and highway speed",
-      "Transmission shifts smoothly through all gears without slipping or delay",
-      "Brakes stop straight without pulling, grinding or pulsing",
-      "Parking brake holds on an incline",
-      "Steering tracks straight without excessive wander or play",
-      "Listen for clunks or rattles over bumps",
-      "Cruise control works",
-      "Engine temperature stays steady during the drive",
-      "Recheck the ground for new leaks after parking"
+    { title:"Living Area", items:[
+      ["Sofa and dinette convert to beds, if designed to","s9g4i0"],
+      ["TVs, entertainment system and antenna work","s9g4i1"],
+      ["Fireplace works, if equipped","s9g4i2"],
+      ["Count sleeping and seat belted positions against your needs","s9g4i3"]
+    ]},
+    { title:"Kitchen", items:[
+      ["Countertops and sink are free of cracks and water damage","s9g1i0"],
+      ["Cabinet bottoms under the sink are dry and solid","s9g1i1"],
+      ["Refrigerator cools on both electric and propane, if it is a two-way or three-way unit","s8g2i0"],
+      ["Freezer reaches freezing temperature","s8g2i1"],
+      ["Every stove burner lights and holds a flame","s8g2i2"],
+      ["Oven lights and heats, if equipped","s8g2i3"],
+      ["Microwave or convection oven works","s8g2i4"],
+      ["Range hood fan and light work","s8g2i5"]
+    ]},
+    { title:"Bathroom", items:[
+      ["Shower pan and surround have no cracks","s9g2i0"],
+      ["Floor around the toilet is solid","s9g2i1"],
+      ["Bathroom vent fan works","s9g2i2"],
+      ["Check headroom in the shower if anyone in the household is tall","s9g2i3"]
+    ]},
+    { title:"Bedroom", items:[
+      ["Bed lifts or slides for storage access as designed","s9g3i0"],
+      ["Closets and wardrobe doors operate","s9g3i1"],
+      ["Check under the mattress platform for moisture","s9g3i2"]
+    ]},
+    { title:"Ceilings & Walls", intro:"Water damage is the most expensive problem to find after purchase. Any notable sign of a leak that was not properly repaired can be reason to walk away.", items:[
+      ["Press on ceilings for softness, especially near vents, AC units and roof penetrations","s1g0i0"],
+      ["Look for stains, ripples or delamination on interior walls","s1g0i1"],
+      ["Check wall bases at floor level for discoloration or softness","s1g0i2"],
+      ["Look inside upper cabinets for water marks on the woodwork","s1g0i3"],
+      ["Use a moisture meter along seams, corners and around openings","s1g0i4"]
+    ]},
+    { title:"Windows & Openings", items:[
+      ["Look for stains on flooring or carpet under each window","s1g1i0"],
+      ["Press around each window frame for soft spots","s1g1i1"],
+      ["Check door frames and the entry step area","s1g1i2"]
+    ]},
+    { title:"Floors", items:[
+      ["Walk the entire floor and feel for soft or spongy spots","s1g3i0"],
+      ["Pay attention in front of the toilet, shower, sinks and entry door","s1g3i1"],
+      ["From outside, look up inside the storage bays at the underside of the floor for discoloration or rot","s1g3i2"]
     ]}
   ]},
 
   { id:"electrical", title:"Electrical & Generator", type:"checklist", groups:[
-    { title:"House batteries and 12V", items:[
-      "Check house battery terminals for corrosion and tight connections",
-      "Measure resting voltage: about 12.6V means fully charged; below 12.0V suggests a battery that needs replacing",
-      "Ask the age and type of the house batteries",
-      "Test every 12V light and fan individually",
-      "Battery disconnect switch works"
+    { title:"House Batteries & 12V", items:[
+      ["Check house battery terminals for corrosion and tight connections","s6g0i0"],
+      ["Measure resting voltage: about 12.6V means fully charged; below 12.0V suggests a battery that needs replacing","s6g0i1"],
+      ["Ask the age and type of the house batteries","s6g0i2"],
+      ["Test every 12V light and fan individually","s6g0i3"],
+      ["Battery disconnect switch works","s6g0i4"]
     ]},
-    { title:"Shore power and 110V", items:[
-      "Inspect the shore power cord and plug for damage or burn marks",
-      "Plug in to shore power and confirm the converter charges the batteries",
-      "Test the inverter, if equipped",
-      "Test every 110V outlet with a plug-in outlet tester",
-      "Check the breaker panel and fuse panel for scorch marks or missing covers",
-      "Look for damaged or spliced wiring anywhere it is visible",
-      "Test the automatic transfer switch, if equipped",
-      "Test solar panels and charge controller, if equipped"
+    { title:"Shore Power & 110V", items:[
+      ["Inspect the shore power cord and plug for damage or burn marks","s6g1i0"],
+      ["Plug in to shore power and confirm the converter charges the batteries","s6g1i1"],
+      ["Test the inverter, if equipped","s6g1i2"],
+      ["Test every 110V outlet with a plug-in outlet tester","s6g1i3"],
+      ["Check the breaker panel and fuse panel for scorch marks or missing covers","s6g1i4"],
+      ["Look for damaged or spliced wiring anywhere it is visible","s6g1i5"],
+      ["Test the automatic transfer switch, if equipped","s6g1i6"],
+      ["Test solar panels and charge controller, if equipped","s6g1i7"]
     ]},
     { title:"Generator", items:[
-      "Record generator hours",
-      "Generator starts promptly from the inside switch and at the unit",
-      "Let it run several minutes and listen for steady operation",
-      "Confirm it powers interior outlets and the AC",
-      "Note how loud it is and check the exhaust for smoke",
-      "Ask for generator service history"
+      ["Record generator hours","s6g2i0"],
+      ["Generator starts promptly from the inside switch and at the unit","s6g2i1"],
+      ["Let it run several minutes and listen for steady operation","s6g2i2"],
+      ["Confirm it powers interior outlets and the AC","s6g2i3"],
+      ["Note how loud it is and check the exhaust for smoke","s6g2i4"],
+      ["Ask for generator service history","s6g2i5"]
     ]}
   ]},
 
   { id:"plumbing", title:"Plumbing & Tanks", type:"checklist", groups:[
-    { items:[
-      "Fill the fresh water tank and run the water pump",
-      "Pump cycles off once pressure builds and does not keep cycling (constant cycling suggests a leak)",
-      "Connect to city water and confirm pressure at the faucets",
-      "Run water at every faucet and showerhead, hot and cold",
-      "Flush the toilet and confirm it seals and holds water",
-      "Look under every sink and behind access panels for leaks",
-      "Check fittings near the water pump and water heater",
-      "Shut off the water and check again for drips",
-      "Tank level monitors read plausibly for fresh, gray and black",
-      "Open and close the gray and black dump valves; handles move freely",
-      "Inspect the sewer hose and storage compartment",
-      "Check for sewer odors inside the coach",
-      "Inspect the water filter and water heater bypass valves",
-      "Ask how the unit was winterized and when"
+    { title:"Water Supply & Pump", items:[
+      ["Fill the fresh water tank and run the water pump","s7g0i0"],
+      ["Pump cycles off once pressure builds and does not keep cycling (constant cycling suggests a leak)","s7g0i1"],
+      ["Connect to city water and confirm pressure at the faucets","s7g0i2"],
+      ["Inspect the water filter and water heater bypass valves","s7g0i12"],
+      ["Ask how the unit was winterized and when","s7g0i13"]
+    ]},
+    { title:"Faucets, Toilet & Leaks", items:[
+      ["Run water at every faucet and showerhead, hot and cold","s7g0i3"],
+      ["Flush the toilet and confirm it seals and holds water","s7g0i4"],
+      ["Look under every sink and behind access panels for leaks","s7g0i5"],
+      ["Check fittings near the water pump and water heater","s7g0i6"],
+      ["Shut off the water and check again for drips","s7g0i7"]
+    ]},
+    { title:"Tanks & Dump", items:[
+      ["Tank level monitors read plausibly for fresh, gray and black","s7g0i8"],
+      ["Open and close the gray and black dump valves; handles move freely","s7g0i9"],
+      ["Inspect the sewer hose and storage compartment","s7g0i10"],
+      ["Check for sewer odors inside the coach","s7g0i11"]
     ]}
   ]},
 
-  { id:"propane", title:"Propane, Appliances & HVAC", type:"checklist", groups:[
-    { title:"Propane system", items:[
-      "Inspect the propane tank for rust, dents and a current certification",
-      "Check the regulator and visible lines for damage",
-      "Smell for propane at the tank, lines and appliances",
-      "Ask when the propane system was last leak tested"
+  { id:"propane", title:"Propane, Heating & Cooling", type:"checklist", groups:[
+    { title:"Propane System", items:[
+      ["Inspect the propane tank for rust, dents and a current certification","s8g0i0"],
+      ["Check the regulator and visible lines for damage","s8g0i1"],
+      ["Smell for propane at the tank, lines and appliances","s8g0i2"],
+      ["Ask when the propane system was last leak tested","s8g0i3"]
     ]},
-    { title:"Water heater", items:[
-      "Lights on propane, if equipped",
-      "Heats on electric, if equipped",
-      "Inspect the anode rod and tank for corrosion and rust"
+    { title:"Water Heater", items:[
+      ["Lights on propane, if equipped","s8g1i0"],
+      ["Heats on electric, if equipped","s8g1i1"],
+      ["Inspect the anode rod and tank for corrosion and rust","s8g1i2"]
     ]},
-    { title:"Kitchen appliances", items:[
-      "Refrigerator cools on both electric and propane, if it is a two-way or three-way unit",
-      "Freezer reaches freezing temperature",
-      "Every stove burner lights and holds a flame",
-      "Oven lights and heats, if equipped",
-      "Microwave or convection oven works",
-      "Range hood fan and light work"
-    ]},
-    { title:"Heating and cooling", items:[
-      "Run each AC unit on shore power; it should blow cold within about five minutes",
-      "Furnace ignites and blows warm air from all registers",
-      "Thermostats control each zone",
-      "Ceiling vent fans open, close and run",
-      "Heat pump works, if equipped"
-    ]}
-  ]},
-
-  { id:"interior", title:"Interior: Kitchen, Bath, Bedroom & Living", type:"checklist", groups:[
-    { title:"General", items:[
-      "Note any musty smell, which can point to hidden water damage or mold",
-      "Look for signs of rodents or insects, including droppings and chewed materials",
-      "Check for smoke or pet odors",
-      "Cabinets and drawers open, close and latch for travel",
-      "Blinds and shades raise, lower and stay in place",
-      "Upholstery, cushions and flooring are in acceptable condition"
-    ]},
-    { title:"Kitchen", items:[
-      "Countertops and sink are free of cracks and water damage",
-      "Cabinet bottoms under the sink are dry and solid"
-    ]},
-    { title:"Bathroom", items:[
-      "Shower pan and surround have no cracks",
-      "Floor around the toilet is solid",
-      "Bathroom vent fan works",
-      "Check headroom in the shower if anyone in the household is tall"
-    ]},
-    { title:"Bedroom", items:[
-      "Bed lifts or slides for storage access as designed",
-      "Closets and wardrobe doors operate",
-      "Check under the mattress platform for moisture"
-    ]},
-    { title:"Living area", items:[
-      "Sofa and dinette convert to beds, if designed to",
-      "TVs, entertainment system and antenna work",
-      "Fireplace works, if equipped",
-      "Count sleeping and seat belted positions against your needs"
+    { title:"Heating & Cooling", items:[
+      ["Run each AC unit on shore power; it should blow cold within about five minutes","s8g3i0"],
+      ["Furnace ignites and blows warm air from all registers","s8g3i1"],
+      ["Thermostats control each zone","s8g3i2"],
+      ["Ceiling vent fans open, close and run","s8g3i3"],
+      ["Heat pump works, if equipped","s8g3i4"]
     ]}
   ]},
 
   { id:"safety", title:"Safety Equipment", type:"checklist", groups:[
-    { items:[
-      "Smoke detector is present and tests",
-      "Carbon monoxide detector is present, tests and is within its expiration date",
-      "Propane leak detector is present and tests",
-      "Fire extinguisher is present, charged and within date",
-      "Emergency exit window opens fully and is unobstructed",
-      "Entry door and exit window latches release easily from inside"
+    { title:"Detectors, Extinguisher & Exits", items:[
+      ["Smoke detector is present and tests","s10g0i0"],
+      ["Carbon monoxide detector is present, tests and is within its expiration date","s10g0i1"],
+      ["Propane leak detector is present and tests","s10g0i2"],
+      ["Fire extinguisher is present, charged and within date","s10g0i3"],
+      ["Emergency exit window opens fully and is unobstructed","s10g0i4"],
+      ["Entry door and exit window latches release easily from inside","s10g0i5"]
+    ]}
+  ]},
+
+  { id:"drive", title:"Cab & Test Drive", type:"checklist", groups:[
+    { title:"Cockpit", items:[
+      ["All gauges work, including fuel, temperature, oil pressure and speedometer","s5g0i0"],
+      ["Headlights, high beams, turn signals, brake lights and hazards work","s5g0i1"],
+      ["Horn, wipers and washer fluid work","s5g0i2"],
+      ["Dash AC and heat work","s5g0i3"],
+      ["Driver and passenger seats adjust and swivel if equipped","s5g0i4"],
+      ["Seat belts latch and retract","s5g0i5"],
+      ["Cab door locks and windows operate correctly","s5g0i6"],
+      ["Backup camera and side cameras work","s5g0i7"],
+      ["Mirrors adjust, including powered or heated mirrors","s5g0i8"],
+      ["Dash radio and any navigation work","s5g0i9"]
+    ]},
+    { title:"Test Drive", items:[
+      ["Drive at both low speed and highway speed","s5g1i0"],
+      ["Transmission shifts smoothly through all gears without slipping or delay","s5g1i1"],
+      ["Brakes stop straight without pulling, grinding or pulsing","s5g1i2"],
+      ["Parking brake holds on an incline","s5g1i3"],
+      ["Steering tracks straight without excessive wander or play","s5g1i4"],
+      ["Listen for clunks or rattles over bumps","s5g1i5"],
+      ["Cruise control works","s5g1i6"],
+      ["Engine temperature stays steady during the drive","s5g1i7"],
+      ["Recheck the ground for new leaks after parking","s5g1i8"]
     ]}
   ]}
 ];
 
 // Short names for the sticky nav chips (falls back to the full title).
 const SHORT = {
-  docs:"Documents", water:"Water & Structure", exterior:"Exterior",
-  tires:"Tires & Chassis", engine:"Engine", cab:"Test Drive", electrical:"Electrical",
-  plumbing:"Plumbing", propane:"Propane & HVAC", interior:"Interior", safety:"Safety"
+  docs:"Documents", exterior:"Exterior", engine:"Engine", interior:"Interior",
+  electrical:"Electrical", plumbing:"Plumbing", propane:"Propane & HVAC",
+  safety:"Safety", drive:"Test Drive"
 };
 
 // ----------------------------------------------------------
 const STORAGE_KEY = "motorhome-checklist-v1";
 const META_IDS = ["unit","seller","date","price","link"];
 const ISSUE_COLS = ["issue","location","cost"];
-const BLANK = () => ({ meta:{}, checks:{}, flags:{}, notes:{}, fields:{}, flagged:{}, issues:[], custom:{}, customSeq:0, fv:2 });
+const BLANK = () => ({ meta:{}, checks:{}, flags:{}, notes:{}, fields:{}, flagged:{}, issues:[], custom:{}, customSeq:0, fv:3 });
 let state = BLANK();
 let saveTimer = null;
 
@@ -319,7 +313,10 @@ function esc(s){
 // Items in one group: the built-in ones plus any added to this form only.
 function groupItems(sec, si, gi){
   const g = sec.groups[gi];
-  const base = g.items.map((label, ii) => ({ id:`s${si}g${gi}i${ii}`, label }));
+  const base = g.items.map((it, ii) => {
+    const label = Array.isArray(it) ? it[0] : it;
+    return { id:(Array.isArray(it) && it[1]) || `n${si}g${gi}i${ii}`, label };
+  });
   const extra = (state.custom[si + "-" + gi] || []).map(c => ({ id:c.id, label:c.label, custom:true }));
   return base.concat(extra);
 }
@@ -349,11 +346,11 @@ function itemHTML(it){
     </div>`;
 }
 
-function subsectionHTML(key, title, inner){
+function subsectionHTML(key, title, inner, num){
   return `
     <div class="subsection collapsed" id="sub-${key}">
       <div class="sub-head" role="button" tabindex="0" aria-expanded="false">
-        <span class="sub-title">${esc(title)}</span>
+        <span class="sub-title"><span class="sub-num">${String(num).padStart(2, "0")}</span>${esc(title)}</span>
         <span class="sub-right"><span class="sub-count" id="subcount-${key}"></span><span class="chevron">▾</span></span>
       </div>
       <div class="sub-body">${inner}</div>
@@ -364,14 +361,14 @@ function buildSection(sec, si){
   const el = document.createElement("div");
   el.className = "section collapsed" + (sec.type === "redflags" ? " redflags" : "");
   el.id = "sec-" + si;
-  let body = "";
+  let body = "", subNum = 0;
   if(sec.intro) body += `<div class="section-intro">${esc(sec.intro)}</div>`;
 
   if(sec.type === "details"){
     const grid = `<div class="field-grid">` + sec.fields.map((f, fi) =>
       `<div class="pf${f[1] ? " wide" : ""}"><label for="fd-${fi}">${esc(f[0])}</label><input id="fd-${fi}" data-field="${fi}"></div>`
     ).join("") + `</div>`;
-    body += subsectionHTML(si + "-f", "Unit details", grid);
+    body += subsectionHTML(si + "-f", "Unit details", grid, ++subNum);
   }
 
   (sec.groups || []).forEach((g, gi) => {
@@ -385,7 +382,7 @@ function buildSection(sec, si){
            <button type="button" class="add-cancel">Done</button>
          </div>
        </div>`;
-    body += g.title ? subsectionHTML(si + "-" + gi, g.title, inner) : inner;
+    body += g.title ? subsectionHTML(si + "-" + gi, g.title, inner, ++subNum) : inner;
   });
 
   if(sec.type === "redflags"){
@@ -451,18 +448,18 @@ function addCustomItem(area){
   if(!label){ input.focus(); return; }
   const key = area.dataset.group, parts = key.split("-").map(Number);
   state.customSeq = (state.customSeq || 0) + 1;
-  (state.custom[key] = state.custom[key] || []).push({ id:`s${parts[0]}g${parts[1]}c${state.customSeq}`, label });
+  (state.custom[key] = state.custom[key] || []).push({ id:`c${state.customSeq}`, label });
   input.value = "";
   renderGroupItems(parts[0], parts[1]); refreshCounts(); scheduleSave();
   input.focus(); // stay open so several items can be added in a row
 }
 function removeCustomItem(id){
-  const m = /^s(\d+)g(\d+)c/.exec(id);
-  if(!m || !confirm("Remove this item from this form?")) return;
-  const key = m[1] + "-" + m[2];
-  state.custom[key] = (state.custom[key] || []).filter(c => c.id !== id);
+  const key = Object.keys(state.custom).find(k => state.custom[k].some(c => c.id === id));
+  if(!key || !confirm("Remove this item from this form?")) return;
+  state.custom[key] = state.custom[key].filter(c => c.id !== id);
   delete state.checks[id]; delete state.flagged[id]; delete state.notes[id];
-  renderGroupItems(Number(m[1]), Number(m[2])); refreshCounts(); scheduleSave();
+  const parts = key.split("-").map(Number);
+  renderGroupItems(parts[0], parts[1]); refreshCounts(); scheduleSave();
 }
 
 // ---- Note pop-up ----
@@ -689,6 +686,17 @@ function loadState(){
         saved.meta = saved.meta || {};
         if(f[5] && !saved.meta.price) saved.meta.price = f[5];
         saved.fields = nf; saved.fv = 2;
+      }
+      // v3 regrouped the checklist as a walkthrough. Item ids are unchanged, so ticks, flags
+      // and notes carry over; only items added to a group need moving to its new home.
+      if(saved.fv < 3){
+        const map = {"0-0": "0-0", "2-0": "1-0", "2-1": "1-1", "1-4": "1-2", "1-5": "1-3", "1-2": "1-4", "2-2": "1-5", "2-3": "1-6", "2-4": "1-7", "3-0": "1-8", "3-1": "1-9", "4-0": "2-0", "4-1": "2-1", "9-0": "3-0", "9-4": "3-1", "9-1": "3-2", "8-2": "3-2", "9-2": "3-3", "9-3": "3-4", "1-0": "3-5", "1-1": "3-6", "1-3": "3-7", "6-0": "4-0", "6-1": "4-1", "6-2": "4-2", "7-0": "5-0", "8-0": "6-0", "8-1": "6-1", "8-3": "6-2", "10-0": "7-0", "5-0": "8-0", "5-1": "8-1"};
+        const moved = {};
+        Object.keys(saved.custom || {}).forEach(k => {
+          const nk = map[k] || k;
+          moved[nk] = (moved[nk] || []).concat(saved.custom[k]);
+        });
+        saved.custom = moved; saved.fv = 3;
       }
       state = Object.assign(BLANK(), saved);
     }

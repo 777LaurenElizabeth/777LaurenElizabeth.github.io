@@ -453,3 +453,5 @@ button.start-btn.alt{border:2px solid var(--ink);}
 .redflags-card{border-left-color:var(--orange-deep);}
 .redflags-card .redflag-list{padding:0;margin:4px 0 0;}
 .plate-fields .pf.wide{grid-column:1/-1;}
+
+.sub-num{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--orange-deep);margin-right:8px;font-weight:700;}
